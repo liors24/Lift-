@@ -146,6 +146,17 @@ nav button.act{background:var(--acc);color:#0b0d10;font-weight:700}
 .tgl.on{background:var(--acc)}
 .tgl.on::after{right:24px;background:#0b0d10}
 
+.demo{position:relative;border-radius:22px;overflow:hidden;background:#fff;aspect-ratio:16/10;margin:2px 0 16px;border:1px solid var(--line)}
+.demo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.demo img.f1{animation:flip 1.8s ease-in-out infinite}
+@keyframes flip{0%,38%{opacity:0}50%,88%{opacity:1}100%{opacity:0}}
+.demo .live{position:absolute;top:10px;right:10px;background:rgba(11,13,16,.75);color:var(--acc);font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px;letter-spacing:1px;backdrop-filter:blur(6px)}
+.demo.thumb{width:62px;height:46px;aspect-ratio:auto;border-radius:12px;margin:0;flex:none}
+.demo.thumb .live{display:none}
+.demo.paused img.f1{animation-play-state:paused}
+#restDemo{width:min(78vw,320px);margin:0 0 4px}
+#rest.has-demo .ring{width:min(46vw,190px);margin:14px 0}
+#rest.has-demo .ring .t{font-size:clamp(40px,12vw,54px)}
 .hist-item{padding:14px 0;border-bottom:1px solid var(--line)}
 .hist-item:last-child{border:0}
 .toast{position:fixed;top:calc(16px + var(--safe-t));left:50%;transform:translateX(-50%) translateY(-120px);background:var(--acc);color:#0b0d10;font-weight:700;padding:12px 20px;border-radius:99px;z-index:50;transition:.35s;white-space:nowrap}
@@ -164,6 +175,7 @@ nav button.act{background:var(--acc);color:#0b0d10;font-weight:700}
 
 <div id="rest" class="hide">
   <div class="lbl" id="restLbl">מנוחה</div>
+  <div id="restDemo"></div>
   <div class="ring" id="ring">
     <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="#1c2027" stroke-width="8"/>
     <circle id="ringC" cx="60" cy="60" r="54" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="0"/>
@@ -231,6 +243,7 @@ const QUOTES = [
  'המנוחה היא חלק מהאימון – תטען אנרגיה ⚡','עוד קצת ואתה שם. אל תוותר עכשיו.'
 ];
 
+const demo=(id,cls='')=>`<div class="demo ${cls}"><img src="img/${id}_0.jpg" alt="" loading="lazy"><img class="f1" src="img/${id}_1.jpg" alt="" loading="lazy"><span class="live">● LIVE</span></div>`;
 /* ================= STATE ================= */
 const KEY='lift.v1';
 const defaults={setup:false,days:[],restSet:120,restEx:120,restAbs:60,sound:true,vib:true,next:0,history:[],cardio:[],last:{},session:null};
@@ -373,7 +386,7 @@ function home(){
    <h2>התוכנית שלך</h2>
    ${PROGRAM.map(p=>`<div class="card" style="margin-bottom:10px"><div class="row between"><b style="font-size:17px">${p.emoji} אימון ${p.id} · ${p.name}</b>
      <button class="chip acc" data-start="${p.id}">התחל</button></div>
-     <div style="margin-top:6px">${p.ex.map((e,i)=>`<div class="plan-item"><div class="num">${i+1}</div><div style="flex:1"><div class="nm">${e.n}</div><div class="small mut">${e.m} · ${e.s} סטים</div></div></div>`).join('')}</div></div>`).join('')}
+     <div style="margin-top:6px">${p.ex.map((e,i)=>`<div class="plan-item">${demo(e.id,'thumb')}<div style="flex:1"><div class="nm">${e.n}</div><div class="small mut">${e.m} · ${e.s} סטים</div></div></div>`).join('')}</div></div>`).join('')}
   </div>`;
   app.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
   $('#addCardio').onclick=()=>{ const m=parseInt(prompt('כמה דקות הליכה עשית?','40')); if(m>0){S.cardio.push({t:Date.now(),min:m});save();render();toast(`+${m} דק׳ אירובי 🚶`);} };
@@ -397,6 +410,7 @@ function workoutView(){
      <div class="small mut">${w.emoji} ${w.name} · <span id="elapsed">${fmt((Date.now()-s.start)/1000)}</span></div>
      <button class="icon-btn" id="skipEx" title="דלג על תרגיל">⏭</button></div>
    <div class="prog">${w.ex.map((x,i)=>`<i class="${i<s.ex?'d':i===s.ex?'c':''}"></i>`).join('')}</div>
+   ${demo(e.id)}
    <span class="chip acc">${e.m} · תרגיל ${s.ex+1}/${w.ex.length}</span>
    <div class="ex-title">${e.n}</div>
    <div class="setdots">${Array.from({length:e.s},(_,i)=>`<i class="${i<s.set?'d':i===s.set?'c':''}">${i<s.set?'✓':i+1}</i>`).join('')}</div>
@@ -409,7 +423,7 @@ function workoutView(){
    <button class="btn btn-acc" id="doneSet">✓ סיימתי סט ${s.set+1}</button>`}
    <div class="next-up">אחרי המנוחה: ${nxt}</div>
   </div>`;
-  if(e.t){ $('#holdBtn').onclick=()=>{ ac(); vib(30); startRest(e.t,'⏱ '+e.n,'תחזיק! אל תוותר עכשיו 🔥',finishSet,'hold'); }; }
+  if(e.t){ $('#holdBtn').onclick=()=>{ ac(); vib(30); startRest(e.t,'⏱ '+e.n,'תחזיק! אל תוותר עכשיו 🔥',finishSet,'hold',e.id); }; }
   else {
   app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const i=b.dataset.st==='w'?$('#iw'):$('#ir'); i.value=Math.max(0,(parseFloat(i.value)||0)+parseFloat(b.dataset.v)); s.cur={w:$('#iw').value,r:$('#ir').value}; save(); vib(8);});
   ['#iw','#ir'].forEach(q=>$(q).oninput=()=>{s.cur={w:$('#iw').value,r:$('#ir').value};save();});
@@ -429,7 +443,7 @@ function finishSet(){
 function advanceExercise(skipped){
   const s=S.session, w=W(s.wid);
   s.cur=null;
-  if(s.ex+1<w.ex.length){ s.ex++; s.set=0; save(); render(); if(!skipped) startRest(w.ex[s.ex].ab&&w.ex[s.ex-1].ab?S.restAbs:S.restEx,'מנוחה בין תרגילים',`הבא: ${w.ex[s.ex].n}`); }
+  if(s.ex+1<w.ex.length){ s.ex++; s.set=0; save(); render(); if(!skipped) startRest(w.ex[s.ex].ab&&w.ex[s.ex-1].ab?S.restAbs:S.restEx,'מנוחה בין תרגילים',`הבא: ${w.ex[s.ex].n}`,null,null,w.ex[s.ex].id); }
   else { s.phase='cardio'; save(); render(); }
 }
 
@@ -475,13 +489,14 @@ function summaryView(){
 
 /* ================= REST TIMER ================= */
 let REST=null, RAF=null;
-function startRest(sec,label,nextTxt,onEnd,mode){
+function startRest(sec,label,nextTxt,onEnd,mode,exId){
   const isWalk=mode===true||mode==='walk', hold=mode==='hold';
   REST={end:Date.now()+sec*1000,total:sec*1000,nextTxt,onEnd,isWalk,hold,step:isWalk?300:hold?5:15,beeped:{},fired:false};
   $('#restLbl').textContent=label; $('#restNext').textContent=nextTxt;
   $('#quote').textContent=hold?'💪':QUOTES[Math.floor(Math.random()*QUOTES.length)];
   $('#skipRest').textContent=isWalk||hold?'סיימתי ✓':'יאללה ▶';
   $('#minus15').textContent=isWalk?'‎−5 דק׳':'‎−'+REST.step; $('#plus15').textContent=isWalk?'‎+5 דק׳':'‎+'+REST.step;
+  $('#restDemo').innerHTML=exId?demo(exId):''; $('#rest').classList.toggle('has-demo',!!exId);
   $('#rest').classList.remove('hide'); $('#ring').classList.remove('end');
   clearInterval(RAF); RAF=setInterval(tick,200); tick();
   if(document.visibilityState!=='visible')notifyRest();
