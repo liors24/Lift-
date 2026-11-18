@@ -164,6 +164,45 @@ nav button.act{background:var(--acc);color:#0b0d10;font-weight:700}
 .btn[disabled]{opacity:.5}
 .spin{width:18px;height:18px;border:3px solid rgba(0,0,0,.25);border-top-color:#0b0d10;border-radius:50%;display:inline-block;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+#scanfx{position:fixed;inset:0;z-index:40;background:#000;overflow:hidden;transition:opacity .35s}
+#scanfx.out{opacity:0}
+.sf-img{position:absolute;inset:0;background-size:cover;background-position:center;animation:zoom 6s ease-out forwards;filter:saturate(1.1)}
+@keyframes zoom{to{transform:scale(1.12)}}
+.sf-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(198,255,61,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(198,255,61,.08) 1px,transparent 1px);background-size:32px 32px;box-shadow:inset 0 0 120px 40px rgba(0,0,0,.7)}
+.sf-laser{position:absolute;left:6%;right:6%;height:3px;background:var(--acc);box-shadow:0 0 18px 4px rgba(198,255,61,.8),0 0 60px 20px rgba(198,255,61,.25);animation:laser 1.8s ease-in-out infinite alternate;border-radius:9px}
+@keyframes laser{from{top:14%}to{top:82%}}
+.sf-c{position:absolute;width:44px;height:44px;border:4px solid var(--acc);animation:brk 1.2s ease-in-out infinite alternate}
+.sf-c.tl{top:11%;right:5%;border-left:0;border-bottom:0;border-radius:0 14px 0 0}.sf-c.tr{top:11%;left:5%;border-right:0;border-bottom:0;border-radius:14px 0 0 0}
+.sf-c.bl{bottom:15%;right:5%;border-left:0;border-top:0;border-radius:0 0 14px 0}.sf-c.br{bottom:15%;left:5%;border-right:0;border-top:0;border-radius:0 0 0 14px}
+@keyframes brk{to{transform:scale(.92);opacity:.7}}
+.sf-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--acc);opacity:0;animation:ping 2.4s ease-out infinite}
+.sf-dot::after{content:'';position:absolute;inset:-10px;border:2px solid var(--acc);border-radius:50%}
+@keyframes ping{0%{opacity:0;transform:scale(.3)}15%{opacity:1;transform:scale(1)}60%{opacity:.8}100%{opacity:0;transform:scale(1.6)}}
+.sf-msg{position:absolute;left:50%;bottom:calc(40px + var(--safe-b));transform:translateX(-50%);display:flex;gap:10px;align-items:center;background:rgba(11,13,16,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:14px 22px;border-radius:99px;border:1px solid rgba(198,255,61,.35);white-space:nowrap;font-size:16px}
+.sf-msg b.sw{animation:fade .35s ease}
+.pop{opacity:0;animation:popin .45s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes popin{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+#celebrate{position:fixed;inset:0;z-index:45;background:radial-gradient(90% 60% at 50% 30%,rgba(198,255,61,.14),transparent 70%),rgba(11,13,16,.97);opacity:0;transition:opacity .3s;overflow:hidden}
+#celebrate.open{opacity:1}
+.cb-in{max-width:420px;margin:0 auto;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 22px calc(24px + var(--safe-b));text-align:center}
+.cb-food{width:92px;height:92px;border-radius:26px;object-fit:cover;border:3px solid var(--acc);box-shadow:0 10px 40px -10px rgba(198,255,61,.6);animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.cb-chips{display:flex;gap:8px;margin:14px 0 4px;height:38px}
+.fly{background:var(--card2);border:1px solid var(--line);padding:8px 14px;border-radius:99px;font-weight:700;opacity:0;animation:fly 1.3s cubic-bezier(.3,.7,.3,1) forwards}
+.fly.acc{color:#0b0d10;background:var(--acc)}
+@keyframes fly{0%{opacity:0;transform:translateY(-20px) scale(.6)}25%{opacity:1;transform:none}70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(90px) scale(.5)}}
+.cb-ring{position:relative;width:200px;height:200px;margin:8px 0}
+.cb-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.cb-rt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cb-rt b{font-size:44px;font-weight:900;font-variant-numeric:tabular-nums}.cb-rt span{font-size:13px;color:var(--mut)}
+.cb-pro{width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;font-variant-numeric:tabular-nums}
+.cb-praise{opacity:0;transform:translateY(16px) scale(.9);transition:all .5s cubic-bezier(.2,1.5,.4,1);margin-top:18px;min-height:120px}
+.cb-praise.show{opacity:1;transform:none}
+.cb-emo{font-size:54px;line-height:1}.cb-praise.show .cb-emo{animation:wig .8s ease .2s}
+@keyframes wig{25%{transform:rotate(-14deg) scale(1.2)}50%{transform:rotate(12deg) scale(1.2)}75%{transform:rotate(-6deg)}}
+.cb-btn{opacity:0;transition:opacity .4s .3s}.cb-btn.show{opacity:1}
+#confetti{position:absolute;inset:0;pointer-events:none}
+#confetti i{position:absolute;top:-20px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{top:110%;transform:rotate(720deg) translateX(40px)}}
 .hist-item{padding:14px 0;border-bottom:1px solid var(--line)}
 .hist-item:last-child{border:0}
 .toast{position:fixed;top:calc(16px + var(--safe-t));left:50%;transform:translateX(-50%) translateY(-120px);background:var(--acc);color:#0b0d10;font-weight:700;padding:12px 20px;border-radius:99px;z-index:50;transition:.35s;white-space:nowrap}
@@ -200,6 +239,7 @@ nav button.act{background:var(--acc);color:#0b0d10;font-weight:700}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div id="scanfx" class="hide"></div><div id="celebrate" class="hide"></div>
 <div id="sheet" class="hide"><div class="sh-in"></div></div>
 
 <script>
@@ -751,33 +791,37 @@ async function scanSheet(file){
     <div style="height:12px"></div><button class="btn btn-acc" id="go">🤖 נתח ארוחה</button>`);
   $('#go').onclick=async()=>{
     const hint=$('#hint').value.trim();
-    $('#go').innerHTML='<span class="spin"></span> מנתח את הצלחת…'; $('#go').disabled=true;
+    closeSheet(); const stop=scanFx(im.full); const t0=Date.now();
     try{
       const res=await askAI([{text:AI_PROMPT+(hint?`\nהערת המשתמש: ${hint}`:'')},{inline_data:{mime_type:'image/jpeg',data:im.b64}}]);
-      resultSheet(res,im.thumb);
-    }catch(e){ toast(AIERR(e)); $('#go').textContent='🤖 נסה שוב'; $('#go').disabled=false; }
+      await new Promise(r=>setTimeout(r,Math.max(0,2600-(Date.now()-t0))));
+      stop(); vib([20,30,20]); beep(880,.1,.12); resultSheet(res,im.thumb,true);
+    }catch(e){ stop(); toast(AIERR(e)); }
   };
 }
 
-function resultSheet(res,thumb){
-  let items=(res.items||[]).map(x=>({...x,on:true})); let mult=1;
-  const draw=()=>{
+function resultSheet(res,thumb,anim){
+  let items=(res.items||[]).map(x=>({...x,on:true})); let mult=1; let first=true;
+  const draw=()=>{ const A=first&&anim!==false;
     const on=items.filter(x=>x.on), t=k=>Math.round(on.reduce((a,x)=>a+(+x[k]||0),0)*mult);
     sheet(`<div class="row" style="gap:12px">${thumb?`<img src="${thumb}" style="width:64px;height:64px;border-radius:16px;object-fit:cover">`:''}
-      <div><div class="small mut">זוהה · ודאות ${res.confidence||'—'}</div><b style="font-size:26px;font-weight:900">${t('kcal')} קק״ל</b></div></div>
-     <div class="big-stat" style="margin:14px 0"><div><b>${t('protein')}</b><span>חלבון</span></div><div><b style="color:#5aa9ff">${t('carbs')}</b><span>פחמימות</span></div><div><b style="color:#ffb43d">${t('fat')}</b><span>שומן</span></div></div>
-     ${items.length?items.map((x,i)=>`<div class="row between hist-item" data-tg="${i}" style="opacity:${x.on?1:.35}"><div><b style="font-weight:500">${x.on?'✓':'○'} ${x.name}</b><div class="small mut">~${Math.round(x.grams*mult)} ג׳ · ${Math.round(x.kcal*mult)} קק״ל · ${Math.round(x.protein*mult)} ג׳ חלבון</div></div></div>`).join(''):'<p class="mut">לא זוהה אוכל בתמונה 🤔</p>'}
+      <div><div class="small mut">זוהה · ודאות ${res.confidence||'—'}</div><b style="font-size:26px;font-weight:900"><span data-cnt="${t('kcal')}">${A?0:t('kcal')}</span> קק״ל</b></div></div>
+     <div class="big-stat" style="margin:14px 0"><div class="${A?'pop':''}" style="animation-delay:.1s"><b data-cnt="${t('protein')}">${A?0:t('protein')}</b><span>ג׳ חלבון</span></div><div class="${A?'pop':''}" style="animation-delay:.2s"><b style="color:#5aa9ff" data-cnt="${t('carbs')}">${A?0:t('carbs')}</b><span>פחמימות</span></div><div class="${A?'pop':''}" style="animation-delay:.3s"><b style="color:#ffb43d" data-cnt="${t('fat')}">${A?0:t('fat')}</b><span>שומן</span></div></div>
+     ${items.length?items.map((x,i)=>`<div class="row between hist-item ${A?'pop':''}" data-tg="${i}" style="${A?`animation-delay:${.45+i*.22}s;`:''}${x.on?'':'opacity:.35'}"><div><b style="font-weight:500">${x.on?'✓':'○'} ${x.name}</b><div class="small mut">~${Math.round(x.grams*mult)} ג׳ · ${Math.round(x.kcal*mult)} קק״ל · ${Math.round(x.protein*mult)} ג׳ חלבון</div></div></div>`).join(''):'<p class="mut">לא זוהה אוכל בתמונה 🤔</p>'}
      <div class="set-row"><div>גודל מנה</div><div class="seg" id="mul">${[.5,.75,1,1.25,1.5,2].map(m=>`<button data-m="${m}" class="${m===mult?'on':''}">×${m}</button>`).join('')}</div></div>
      ${res.tip?`<div class="next-up" style="margin-top:6px">💡 ${res.tip}</div>`:''}
      <div style="height:12px"></div><button class="btn btn-acc" id="addm" ${on.length?'':'disabled'}>+ הוסף לארוחת ${mealName()}</button>`);
+    if(A){ $('#sheet').querySelectorAll('[data-cnt]').forEach(el=>countUp(el,0,+el.dataset.cnt,1300)); }
+    first=false;
     $('#sheet').querySelectorAll('[data-tg]').forEach(r=>r.onclick=()=>{items[+r.dataset.tg].on=!items[+r.dataset.tg].on;draw();});
     $('#mul').querySelectorAll('button').forEach(b=>b.onclick=()=>{mult=+b.dataset.m;draw();});
     $('#addm').onclick=()=>{ addFood({name:on.map(x=>x.name).join(', '),kcal:t('kcal'),p:t('protein'),c:t('carbs'),f:t('fat'),img:thumb}); closeSheet(); };
   };
   draw();
 }
-function addFood(x){ const k=todayKey(); (NT().log[k]=NT().log[k]||[]).push({...x,meal:mealName(),t:Date.now()}); save(); vib(20);
-  const T=targets(), pr=sum(dayLog(),'p'); toast(pr>=T.pro?'🥩 יעד החלבון הושג היום!':`נוסף ✓ · חסר ${T.pro-pr} ג׳ חלבון`); if(VIEW==='nutrition') nutritionView(); else render(); }
+function addFood(x){ const k=todayKey(); const L0=dayLog(); const prev={k:sum(L0,'kcal'),p:sum(L0,'p')};
+  (NT().log[k]=NT().log[k]||[]).push({...x,meal:mealName(),t:Date.now()}); save(); vib(20);
+  const L=dayLog(); celebrate(prev,{k:sum(L,'kcal'),p:sum(L,'p')},{kcal:Math.round(x.kcal),p:Math.round(x.p),img:x.img}); }
 
 function manualSheet(){
   const fld=(id,l,m='numeric')=>`<div class="stepper"><label>${l}</label><input id="${id}" inputmode="${m}" style="width:100%;margin-top:6px;font-size:20px"></div>`;
@@ -796,6 +840,55 @@ function manualSheet(){
   $('#madd').onclick=()=>{ const n=$('#mn').value.trim()||'ארוחה'; const k=+$('#mk').value||0; if(!k&&!+$('#mp').value) return toast('מלא קלוריות או חלבון');
     addFood({name:n,kcal:k,p:+$('#mp').value||0,c:+$('#mc').value||0,f:+$('#mf').value||0}); closeSheet(); };
 }
+
+/* ================= SCAN / CELEBRATION FX ================= */
+const ease=t=>1-Math.pow(1-t,3);
+function countUp(el,from,to,dur=1200,suffix=''){ if(!el)return; const st=performance.now();
+  const f=now=>{const t=Math.min(1,(now-st)/dur); el.textContent=Math.round(from+(to-from)*ease(t))+suffix; if(t<1) requestAnimationFrame(f);}; requestAnimationFrame(f); }
+const SCAN_MSG=['מזהה מאכלים בצלחת…','מעריך גודל מנה…','סופר חלבונים 🥩','מחשב קלוריות 🔥','כמעט מוכן…'];
+function scanFx(img){
+  const el=$('#scanfx'); el.innerHTML=`<div class="sf-img" style="background-image:url(${img})"></div><div class="sf-grid"></div><div class="sf-laser"></div>
+   <div class="sf-c tl"></div><div class="sf-c tr"></div><div class="sf-c bl"></div><div class="sf-c br"></div>
+   ${[...Array(7)].map((_,i)=>`<i class="sf-dot" style="top:${20+Math.random()*55}%;left:${12+Math.random()*70}%;animation-delay:${i*.35}s"></i>`).join('')}
+   <div class="sf-msg"><span class="spin" style="border-color:rgba(198,255,61,.25);border-top-color:var(--acc)"></span><b id="sfm">${SCAN_MSG[0]}</b></div>`;
+  el.classList.remove('hide'); let i=0; const iv=setInterval(()=>{i=(i+1)%SCAN_MSG.length; const m=$('#sfm'); if(m){m.classList.remove('sw');void m.offsetWidth;m.classList.add('sw');m.textContent=SCAN_MSG[i];}},1300);
+  vib(15);
+  return ()=>{clearInterval(iv); el.classList.add('out'); setTimeout(()=>{el.classList.add('hide');el.classList.remove('out');el.innerHTML='';},350);};
+}
+function praise(meal,tot,T,prevP){
+  const proShare=meal.kcal?meal.p*4/meal.kcal:0;
+  if(prevP<T.pro&&tot.p>=T.pro) return ['🏆','יעד החלבון של היום הושג!','השרירים שלך מודים לך. ככה בונים גוף חטוב.'];
+  if(tot.k>T.kcal*1.05) return ['⚖️','עברת קצת את יעד הקלוריות','לא נורא בכלל – מחר מאזנים. עקביות מנצחת.'];
+  if(meal.p>=35) return ['💪','מכונת חלבון!',`${meal.p} גרם חלבון בארוחה אחת – בדיוק מה שהחיטוב צריך.`];
+  if(proShare>=.3) return ['🔥','ארוחת חיטוב מושלמת','הרבה חלבון, מעט קלוריות. ככה החזה והבטן מתחילים לצאת.'];
+  if(meal.p>=20) return ['👊','ארוחה טובה!',`עוד ${Math.max(0,T.pro-tot.p)} גרם חלבון והיום סגור.`];
+  return ['👍','נרשם!',`שווה להוסיף מקור חלבון בארוחה הבאה – חסרים ${Math.max(0,T.pro-tot.p)} גרם.`];
+}
+function celebrate(prev,tot,meal){
+  const T=targets(); const el=$('#celebrate'); const [emo,title,sub]=praise(meal,tot,T,prev.p);
+  const C=2*Math.PI*80, off=v=>C*(1-Math.min(1,v/T.kcal));
+  el.innerHTML=`<div class="cb-in">
+    ${meal.img?`<img src="${meal.img}" class="cb-food">`:`<div class="cb-food" style="display:grid;place-items:center;font-size:40px;background:var(--card2)">🍽</div>`}
+    <div class="cb-chips"><span class="fly" style="animation-delay:.2s">+<b id="cbk">0</b> קק״ל</span><span class="fly acc" style="animation-delay:.45s">+<b id="cbp">0</b> ג׳ חלבון</span></div>
+    <div class="cb-ring"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="80" fill="none" stroke="#1c2027" stroke-width="14"/>
+      <circle id="cbr" cx="90" cy="90" r="80" fill="none" stroke="${tot.k>T.kcal?'#ff8a3d':'url(#g3)'}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off(prev.k)}"/>
+      <defs><linearGradient id="g3"><stop offset="0" stop-color="#3dffb4"/><stop offset="1" stop-color="#c6ff3d"/></linearGradient></defs></svg>
+      <div class="cb-rt"><b id="cbtk">${prev.k}</b><span>מתוך ${T.kcal} קק״ל</span></div></div>
+    <div class="cb-pro"><div class="row between small"><span>🥩 חלבון היום</span><b><span id="cbtp">${prev.p}</span> / ${T.pro} ג׳</b></div>
+      <div class="bar" style="height:14px;margin-top:8px"><i id="cbpb" style="width:${Math.min(100,prev.p/T.pro*100)}%;transition:width 1.4s cubic-bezier(.2,.8,.2,1) .9s"></i></div></div>
+    <div class="cb-praise"><div class="cb-emo">${emo}</div><h2 style="margin:6px 0 4px">${title}</h2><p class="mut">${sub}</p></div>
+    <button class="btn btn-acc cb-btn">מעולה ✓</button></div><div id="confetti"></div>`;
+  el.classList.remove('hide'); requestAnimationFrame(()=>el.classList.add('open'));
+  countUp($('#cbk'),0,meal.kcal,900); countUp($('#cbp'),0,meal.p,900);
+  setTimeout(()=>{ $('#cbr').style.transition='stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)'; $('#cbr').style.strokeDashoffset=off(tot.k);
+    countUp($('#cbtk'),prev.k,tot.k,1400); countUp($('#cbtp'),prev.p,tot.p,1400); $('#cbpb').style.width=Math.min(100,tot.p/T.pro*100)+'%';
+    beep(660,.08,.12); },900);
+  setTimeout(()=>{ el.querySelector('.cb-praise').classList.add('show'); el.querySelector('.cb-btn').classList.add('show');
+    const good=tot.k<=T.kcal*1.05; if(good){ confetti(); beep(784,.12,.15); setTimeout(()=>beep(1046,.2,.15),130); vib([30,40,60]); } },2300);
+  el.querySelector('.cb-btn').onclick=()=>{ el.classList.remove('open'); setTimeout(()=>{el.classList.add('hide');el.innerHTML='';},300); if(VIEW==='nutrition') nutritionView(); else render(); };
+}
+function confetti(){ const c=$('#confetti'); if(!c)return; const cols=['#c6ff3d','#3dffb4','#ff8a3d','#5aa9ff','#fff'];
+  c.innerHTML=[...Array(60)].map(()=>`<i style="left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*5)]};animation-delay:${Math.random()*.4}s;animation-duration:${1.6+Math.random()*1.4}s;transform:rotate(${Math.random()*360}deg);width:${6+Math.random()*6}px;height:${10+Math.random()*8}px"></i>`).join(''); }
 
 /* resume a running workout after reload */
 if(S.session) wakeOn();
