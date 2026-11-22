@@ -203,6 +203,15 @@ nav button.act{background:var(--acc);color:#0b0d10;font-weight:700}
 #confetti{position:absolute;inset:0;pointer-events:none}
 #confetti i{position:absolute;top:-20px;border-radius:2px;animation:fall linear forwards}
 @keyframes fall{to{top:110%;transform:rotate(720deg) translateX(40px)}}
+#rest .amb-hint{display:none}
+#rest.amb{background:#000;transition:background .8s}
+#rest.amb>*:not(.ring):not(.amb-hint):not(.rest-next){opacity:0;pointer-events:none;transition:opacity .6s}
+#rest.amb #restDemo,#rest.amb .rest-btns{display:none}
+#rest.amb .ring{width:min(92vw,420px);margin:0}
+#rest.amb .ring svg{opacity:.35}
+#rest.amb .ring .t{font-size:clamp(90px,30vw,150px);color:#d8e0e8;opacity:.85}
+#rest.amb .rest-next{opacity:.55}
+#rest.amb .amb-hint{display:block;position:absolute;bottom:calc(30px + var(--safe-b));font-size:13px;color:#555}
 .hist-item{padding:14px 0;border-bottom:1px solid var(--line)}
 .hist-item:last-child{border:0}
 .toast{position:fixed;top:calc(16px + var(--safe-t));left:50%;transform:translateX(-50%) translateY(-120px);background:var(--acc);color:#0b0d10;font-weight:700;padding:12px 20px;border-radius:99px;z-index:50;transition:.35s;white-space:nowrap}
@@ -237,6 +246,7 @@ nav button.act{background:var(--acc);color:#0b0d10;font-weight:700}
     <button class="btn btn-ghost" id="plus15">‎+15</button>
     <button class="btn btn-acc" id="skipRest">יאללה ▶</button>
   </div>
+  <div class="amb-hint">הקש על המסך להצגה מלאה</div>
 </div>
 <div class="toast" id="toast"></div>
 <div id="scanfx" class="hide"></div><div id="celebrate" class="hide"></div>
@@ -318,7 +328,16 @@ function beep(f=880,d=.12,v=.25){ if(!S.sound)return; const c=ac(); if(!c)return
   const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f;
   g.gain.setValueAtTime(0,c.currentTime); g.gain.linearRampToValueAtTime(v,c.currentTime+.01);
   g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d); o.connect(g).connect(c.destination); o.start(); o.stop(c.currentTime+d+.02); }
-const vib=p=>{ if(S.vib&&navigator.vibrate) navigator.vibrate(p); };
+/* haptics: Android → Vibration API; iPhone (iOS 18+) → native switch haptic. Never touches audio. */
+let HSW=null;
+function iosTap(){ try{ if(!HSW){ const i=document.createElement('input'); i.type='checkbox'; i.id='hsw'; i.setAttribute('switch','');
+  i.style.cssText='position:fixed;top:-200px;left:0;opacity:0;pointer-events:none'; const l=document.createElement('label'); l.htmlFor='hsw'; l.style.cssText=i.style.cssText;
+  document.body.append(i,l); HSW=l; } HSW.click(); }catch(e){} }
+const vib=p=>{ if(!S.vib)return; if(navigator.vibrate){ navigator.vibrate(p); return; }
+  const a=Array.isArray(p)?p:[p]; let t=0; for(let k=0;k<a.length;k+=2){ setTimeout(iosTap,t); t+=(a[k]||0)+(a[k+1]||0); } };
+function vibEnd(){ if(!S.vib)return;
+  if(navigator.vibrate){ navigator.vibrate([400,150,400,150,700]); return; }
+  [0,110,220, 650,760,870, 1300,1410,1520,1630].forEach(t=>setTimeout(iosTap,t)); }
 
 /* ===== wake lock: keep screen on during workout ===== */
 let WL=null;
@@ -559,7 +578,7 @@ function startRest(sec,label,nextTxt,onEnd,mode,exId){
   $('#minus15').textContent=isWalk?'‎−5 דק׳':'‎−'+REST.step; $('#plus15').textContent=isWalk?'‎+5 דק׳':'‎+'+REST.step;
   $('#restDemo').innerHTML=exId?demo(exId):''; $('#rest').classList.toggle('has-demo',!!exId);
   $('#rest').classList.remove('hide'); $('#ring').classList.remove('end');
-  clearInterval(RAF); RAF=setInterval(tick,200); tick();
+  clearInterval(RAF); RAF=setInterval(tick,200); tick(); wakeOn(); ambArm();
   if(document.visibilityState!=='visible')notifyRest();
 }
 function adjRest(d){ if(!REST)return; const step=REST.step; REST.end+=d*step*1000; REST.total=Math.max(REST.total+d*step*1000,1000); REST.beeped={}; vib(10); tick(); }
@@ -572,10 +591,14 @@ function tick(){
   $('#ringC').style.strokeDashoffset=339.3*(1-Math.max(0,left*1000)/REST.total);
   const s=Math.ceil(left);
   if(s<=3&&s>=1&&!REST.beeped[s]){ REST.beeped[s]=1; beep(740,.1,.2); vib(40); }
-  if(left<=0&&!REST.fired){ REST.fired=true; $('#ring').classList.add('end'); beep(988,.35,.3); vib([200,80,200]); notifyGo();
+  if(left<=0&&!REST.fired){ REST.fired=true; $('#ring').classList.add('end'); beep(988,.35,.3); vibEnd(); $('#rest').classList.remove('amb'); notifyGo();
     setTimeout(()=>{ if(REST&&REST.fired) closeRest(); },REST.isWalk?2500:900); }
 }
-function closeRest(){ const r=REST; REST=null; clearInterval(RAF); $('#rest').classList.add('hide');
+let AMB=null;
+function ambArm(){ clearTimeout(AMB); $('#rest').classList.remove('amb'); if(S.amb===false||!REST||REST.hold)return;
+  AMB=setTimeout(()=>{ if(REST&&!REST.fired) $('#rest').classList.add('amb'); },5000); }
+$('#rest').addEventListener('pointerdown',e=>{ if($('#rest').classList.contains('amb')){ e.preventDefault(); e.stopPropagation(); ambArm(); } },true);
+function closeRest(){ clearTimeout(AMB); $('#rest').classList.remove('amb'); const r=REST; REST=null; clearInterval(RAF); $('#rest').classList.add('hide');
   if(SWR&&SWR.getNotifications) SWR.getNotifications({tag:'rest'}).then(n=>n.forEach(x=>x.close())).catch(()=>{});
   if(r&&r.onEnd) r.onEnd(); }
 $('#minus15').onclick=()=>adjRest(-1); $('#plus15').onclick=()=>adjRest(1);
@@ -608,7 +631,8 @@ function settingsView(){
      <div class="set-row"><div>בין תרגילים</div>${seg('re',[60,90,120,150,180],S.restEx)}</div>
      <div class="set-row"><div>בטן (בין סטים)</div>${seg('ra',[30,45,60,90],S.restAbs)}</div>
      <div class="set-row"><div>צלילי טיימר<div class="small mut">מתנגנים מעל המוזיקה בלי לעצור אותה</div></div><button class="tgl ${S.sound?'on':''}" id="ts"></button></div>
-     <div class="set-row"><div>רטט<div class="small mut">באנדרואיד</div></div><button class="tgl ${S.vib?'on':''}" id="tv"></button></div>
+     <div class="set-row"><div>רטט בסיום מנוחה<div class="small mut">ספירה 3-2-1 ורטט חזק בסיום · באייפון iOS 18 ומעלה</div></div><button class="tgl ${S.vib?'on':''}" id="tv"></button></div>
+     <div class="set-row"><div>מסך מנוחה חשוך<div class="small mut">אחרי 5 שנ׳ המסך עובר לספירה גדולה על רקע שחור ונשאר דלוק – כמו מסך נעילה. הקשה מחזירה</div></div><button class="tgl ${S.amb!==false?'on':''}" id="tam"></button></div>
      <div class="set-row"><div>התראות מסך נעילה<div class="small mut">${np==='granted'?'פעיל ✓':np==='denied'?'נחסם – אפשר בהגדרות הטלפון':np==='unsupported'?'דורש התקנה למסך הבית':'מציג מתי המנוחה נגמרת'}</div></div>${np==='default'?'<button class="chip acc" id="np">הפעל</button>':''}</div>
    </div>
    <h2>התקנה לאייפון</h2>
@@ -620,7 +644,8 @@ function settingsView(){
   $('#saveDays').onclick=()=>{ if(!pick.length)return toast('בחר לפחות יום אחד'); S.days=pick; save(); toast('הימים עודכנו והאימונים סונכרנו ✓'); go('home'); };
   [['#rs','restSet'],['#re','restEx'],['#ra','restAbs']].forEach(([q,k])=>$(q).querySelectorAll('button').forEach(b=>b.onclick=()=>{S[k]=+b.dataset.v;save();settingsView();}));
   $('#ts').onclick=()=>{S.sound=!S.sound;save();if(S.sound)beep();settingsView();};
-  $('#tv').onclick=()=>{S.vib=!S.vib;save();vib(30);settingsView();};
+  $('#tv').onclick=()=>{S.vib=!S.vib;save();if(S.vib)vibEnd();settingsView();};
+  $('#tam').onclick=()=>{S.amb=S.amb===false;save();settingsView();};
   const n=$('#np'); if(n) n.onclick=()=>Notification.requestPermission().then(()=>settingsView());
   $('#reset').onclick=()=>{ if(confirm('למחוק את כל הנתונים והיסטוריית האימונים?')){ localStorage.removeItem(KEY); location.reload(); } };
 }
